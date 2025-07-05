@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TravelTogether</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    body {
+      background-image: url("s.jpg");
+      background-size: cover;
+      margin: 0;
+    }
+    header {
+      background-color: #02d1fa;
+      padding: 20px 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+    }
+    header h1 { font-size: 28px; }
+    nav a, nav button {
+      color: white;
+      margin-left: 20px;
+      text-decoration: none;
+      font-weight: bold;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    nav a:hover, nav button:hover { text-decoration: underline; }
+    .section {
+      padding: 20px 50px;
+    }
+    .section h2 {
+      color: white;
+      margin-bottom: 15px;
+    }
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .card {
+      background-color: white;
+      width: 300px;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    .card:hover { transform: scale(1.03); }
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+    .card-body {
+      padding: 15px;
+    }
+    .card-body h3 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+    .card-body p { font-size: 14px; color: #333; }
+    .card-body button {
+      background: #ff4040;
+      border: none;
+      color: white;
+      padding: 8px 14px;
+      margin-top: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .no-trips {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      color: #444;
+      text-align: center;
+      font-size: 16px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #eee;
+      font-size: 14px;
+      color: #555;
+      margin-top: 40px;
+    }
+    @media (max-width: 768px) {
+      .cards { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body onload="loadTrips()">
+  <header>
+    <h1>TravelTogether</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="tripcreation.html">CreateTrip</a>
+      <a href="joinTrip.html">JoinTrip</a>
+      <a id="authLink" href="signup.html">Sign Up</a>
+    </nav>
+  </header>
+
+  <div id="yourTripsSection" class="section" style="display: none;">
+    <h2>Your Trips</h2>
+    <div class="cards" id="yourTrips"></div>
+    <div id="noTripsMessage" class="no-trips" style="display:none;">No trips created yet.</div>
+  </div>
+
+  <div class="section">
+    <h2>Popular Destinations</h2>
+    <div class="cards">
+      <div class="card">
+        <img src="hyd.jpeg" alt="Hyderabad">
+        <div class="card-body">
+          <h3>Hyderabad</h3>
+          <p>Explore the city of nizam's</p>
+        </div>
+      </div>
+      <div class="card">
+        <img src="bengaluru.jpeg" alt="Bengaluru">
+        <div class="card-body">
+          <h3>Bengaluru</h3>
+          <p>Join adventures across Bengaluru’s bustling capital with new friends.</p>
+        </div>
+      </div>
+      <div class="card">
+        <img src="kerala.jpeg" alt="Kerala">
+        <div class="card-body">
+          <h3>Kerala</h3>
+          <p>Discover hidden gems in Kerala while meeting fellow explorers.</p>
+        </div>
+      </div>
+      <div class="card">
+        <img src="ladakh.jpeg" alt="Ladakh">
+        <div class="card-body">
+          <h3>Ladakh</h3>
+          <p>Experience the breathtaking landscapes of Ladakh.</p>
+        </div>
+      </div>
+  
+      <div class="card">
+        <img src="araku.jpeg" alt="Araku">
+        <div class="card-body">
+          <h3>Araku</h3>
+          <p>Explore the scenic beauty of Araku Valley with fellow travelers.</p>
+        </div>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 TravelTogether | Designed with ❤️ for travel lovers
+  </footer>
+
+<script>
+function loadTrips() {
+  const user = localStorage.getItem("username");
+  const authLink = document.getElementById("authLink");
+  const yourTripsContainer = document.getElementById("yourTrips");
+  const yourTripsSection = document.getElementById("yourTripsSection");
+  const noTripsMessage = document.getElementById("noTripsMessage");
+
+  if (user) {
+    authLink.innerHTML = "Logout";
+    authLink.href = "#";
+    authLink.onclick = () => {
+      localStorage.removeItem("username");
+      window.location.reload();
+    };
+    yourTripsSection.style.display = "block";
+
+    const trips = JSON.parse(localStorage.getItem("trips") || "[]");
+    yourTripsContainer.innerHTML = "";
+    let hasTrips = false;
+
+    trips.forEach((trip, index) => {
+      if (trip.createdBy === user) {
+        hasTrips = true;
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <img src="default.jpg" alt="Trip">
+          <div class="card-body">
+            <h3>${trip.destination}</h3>
+            <p>${trip.description}</p>
+            <button onclick="deleteTrip(${index})">Delete</button>
+          </div>`;
+        yourTripsContainer.appendChild(card);
+      }
+    });
+    noTripsMessage.style.display = hasTrips ? "none" : "block";
+  } else {
+    yourTripsSection.style.display = "none";
+  }
+}
+
+function deleteTrip(index) {
+  const trips = JSON.parse(localStorage.getItem("trips") || "[]");
+  trips.splice(index, 1);
+  localStorage.setItem("trips", JSON.stringify(trips));
+  loadTrips();
+}
+</script>
+</body>
+</html>
+ 
